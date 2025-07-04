@@ -92,9 +92,10 @@ if page == "Daily Expenses":
                 
 elif page == "Monthly Overview":
     st.title("📆 Monthly Overview")
-    st.info("Coming soon: View and summarize monthly totals from Notion.")
+    st.button("🚀 Start Tracking Now"):
+       st.switch_page("pages/Monthly-Overview.py")
 
 elif page == "Investment Tracker":
     st.title("📈 Investment Tracker")
-    st.info("Coming soon: Add and track investments from Notion.")
-
+    st.button("🚀 Start Tracking Now"):
+       st.switch_page("pages/Investment-Tracker.py")

@@ -17,7 +17,7 @@ if not NOTION_TOKEN or not DAILY_EXPENSES_DB_ID:
 HEADERS = {
     "Authorization": f"Bearer {NOTION_TOKEN}",
     "Content-Type": "application/json",
-    "Notion-Version": "2022-06-28"  # Stable supported version
+    "Notion-Version": "2022-06-28"  # Stable version
 }
 
 # --- Notion API function ---
@@ -44,7 +44,7 @@ def add_daily_expense(data):
             "Payment Method": {
                 "select": {"name": data["payment_method"]}
             },
-            "Note": {
+            "Notes": {  # ✅ corrected field name
                 "rich_text": [{"text": {"content": data["note"]}}]
             }
         }
@@ -52,7 +52,7 @@ def add_daily_expense(data):
 
     response = requests.post(url, headers=HEADERS, json=payload)
 
-    # Log full response for debugging
+    # Debug response
     if response.status_code not in [200, 201]:
         st.error(f"❌ Error {response.status_code}: {response.text}")
     return response.status_code in [200, 201]
@@ -68,7 +68,7 @@ with st.form("daily_expense_form"):
     category = st.text_input("Category (must match Notion options)")
     expense_type = st.selectbox("Type", ["Expense", "Income", "Investment", "Savings", "Transfer"])
     payment_method = st.text_input("Payment Method (must match Notion options)")
-    note = st.text_area("Note (optional)", height=80)
+    note = st.text_area("Notes (optional)", height=80)
 
     submit = st.form_submit_button("Submit")
 

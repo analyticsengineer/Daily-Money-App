@@ -54,8 +54,8 @@ def add_daily_expenses(data):
     return response.status_code in [200, 201]
 
 # --- Page UI ---
-st.set_page_config(page_title="💹 Daily Money Tracker", layout="centered")
-st.title("📈 Log Daily Money Tracker")
+st.set_page_config(page_title="💹 Daily Money", layout="centered")
+st.title("📈 Log Daily Money")
 
 with st.form("daily_money_tracker_form"):  # ✅ fixed typo in form ID
     transaction = st.text_input("Transaction Name")
@@ -83,6 +83,6 @@ with st.form("daily_money_tracker_form"):  # ✅ fixed typo in form ID
 
             success = add_daily_expenses(data)
             if success:
-                st.success("✅ Daily expense logged successfully!")  # ✅ Clear success message
+                st.success("✅ Daily Money logged successfully!")  # ✅ Clear success message
         except ValueError:
             st.error("❌ Invalid number format. Use numbers only (e.g., 5 or 5%).")

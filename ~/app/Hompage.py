@@ -34,4 +34,4 @@ Let’s take control of your money story.
 )
 
 if st.button("🚀 Start Tracking Now"):
-    st.switch_page("pages/Daily-Expenses.py") 
+    st.switch_page("pages/Daily-Expenses.py")

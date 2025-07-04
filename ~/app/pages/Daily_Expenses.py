@@ -4,18 +4,23 @@ import os
 from dotenv import load_dotenv
 from datetime import date
 
-# Load environment variables
+# --- Load environment variables ---
 load_dotenv()
 
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
 DAILY_EXPENSES_DB_ID = os.getenv("NOTION_DATABASE_ID")
 
+if not NOTION_TOKEN or not DAILY_EXPENSES_DB_ID:
+    st.error("❌ Missing NOTION_TOKEN or NOTION_DATABASE_ID in environment variables.")
+    st.stop()
+
 HEADERS = {
     "Authorization": f"Bearer {NOTION_TOKEN}",
     "Content-Type": "application/json",
-    "Notion-Version": "2022-06-28"  # or current supported version
+    "Notion-Version": "2022-06-28"  # Stable supported version
 }
 
+# --- Notion API function ---
 def add_daily_expense(data):
     url = "https://api.notion.com/v1/pages"
     payload = {
@@ -44,22 +49,27 @@ def add_daily_expense(data):
             }
         }
     }
+
     response = requests.post(url, headers=HEADERS, json=payload)
+
+    # Log full response for debugging
+    if response.status_code not in [200, 201]:
+        st.error(f"❌ Error {response.status_code}: {response.text}")
     return response.status_code in [200, 201]
 
 # --- Streamlit UI ---
-
-st.set_page_config(page_title="Notion Money Tracker App", layout="centered")
+st.set_page_config(page_title="💸 Notion Money Tracker", layout="centered")
 st.title("🧾 Log Daily Expenses")
 
 with st.form("daily_expense_form"):
     transaction = st.text_input("Transaction Name")
     date_value = st.date_input("Date", value=date.today())
     amount_str = st.text_input("Amount (use numbers only)", placeholder="e.g. 5,000")
-    category = st.text_input("Category (enter manually)")
+    category = st.text_input("Category (must match Notion options)")
     expense_type = st.selectbox("Type", ["Expense", "Income", "Investment", "Savings", "Transfer"])
-    payment_method = st.text_input("Payment Method (enter manually)")
+    payment_method = st.text_input("Payment Method (must match Notion options)")
     note = st.text_area("Note (optional)", height=80)
+
     submit = st.form_submit_button("Submit")
 
     if submit:
@@ -77,7 +87,5 @@ with st.form("daily_expense_form"):
             success = add_daily_expense(data)
             if success:
                 st.success("✅ Expense added successfully!")
-            else:
-                st.error("❌ Failed to add expense to Notion.")
         except ValueError:
             st.error("❌ Invalid amount format. Use numbers only.")

@@ -55,8 +55,6 @@ def add_investment_tracker(data):
 # Streamlit App UI
 st.set_page_config(page_title="Notion Money Tracker App", layout="centered")
 
-st.sidebar.title("📊 Notion Money Tracker App")
-page = st.sidebar.radio("Select a page", ["Daily Expenses", "Monthly Overview", "Investment Tracker"])
 
 # --- Investment Tracker Page ---
 if page == "Investment Tracker":

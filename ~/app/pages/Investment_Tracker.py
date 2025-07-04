@@ -9,12 +9,12 @@ load_dotenv()
 
 # Notion setup
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
-INVESTMENT_RETURN_DB_ID = os.getenv("NOTION_DATABASE_ID")
+INVESTMENT_RETURN_DB_ID = os.getenv("NOTION_INVESTMENT_DB_ID")  # Use a specific variable for clarity
 
 HEADERS = {
     "Authorization": f"Bearer {NOTION_TOKEN}",
     "Content-Type": "application/json",
-    "Notion-Version": "2025-07-04"
+    "Notion-Version": "2022-06-28"
 }
 
 # Function to send data to Notion
@@ -35,7 +35,7 @@ def add_investment_tracker(data):
             "Category": {
                 "select": {"name": data["category"]}
             },
-            "Investment Return": {  # Expecting percentage (e.g., 5.0)
+            "Investment Return": {
                 "number": data["investment_return"]
             },
             "Type": {
@@ -44,21 +44,28 @@ def add_investment_tracker(data):
             "Payment Method": {
                 "select": {"name": data["payment_method"]}
             },
-            "Note": {
+            "Notes": {
                 "rich_text": [{"text": {"content": data["note"]}}]
             }
         }
     }
     response = requests.post(url, headers=HEADERS, json=payload)
+
+    # Debugging line
+    if response.status_code not in [200, 201]:
+        st.error(f"❌ Error {response.status_code}: {response.text}")
+
     return response.status_code in [200, 201]
 
-# Streamlit App UI
+# --- Streamlit App UI ---
 st.set_page_config(page_title="Notion Money Tracker App", layout="centered")
 
+# Sidebar page selector
+page = st.sidebar.selectbox("Select a page", ["Investment Tracker", "Monthly Overview", "Daily Expenses"])
 
 # --- Investment Tracker Page ---
 if page == "Investment Tracker":
-    st.title("🧾 Log Investment")
+    st.title("📈 Log Investment")
 
     with st.form("investment_tracker_form"):
         transaction = st.text_input("Transaction Name")
@@ -68,14 +75,13 @@ if page == "Investment Tracker":
         investment_return_str = st.text_input("Investment Return (%)", placeholder="e.g. 5 or 5%")
         expense_type = st.selectbox("Type", ["Expense", "Income", "Investment", "Savings", "Transfer"])
         payment_method = st.text_input("Payment Method (enter manually)")
-        note = st.text_area("Note (optional)", height=80)
+        note = st.text_area("Notes (optional)", height=80)
         submit = st.form_submit_button("Submit")
 
         if submit:
             try:
                 amount = float(amount_str.replace(",", ""))
-                investment_return_clean = investment_return_str.replace("%", "").strip()
-                investment_return = float(investment_return_clean)
+                investment_return = float(investment_return_str.replace("%", "").strip())
 
                 data = {
                     "transaction": transaction,
@@ -91,19 +97,5 @@ if page == "Investment Tracker":
                 success = add_investment_tracker(data)
                 if success:
                     st.success("✅ Investment logged successfully!")
-                else:
-                    st.error("❌ Failed to log investment in Notion.")
             except ValueError:
-                st.error("❌ Invalid number format. Use numbers only, e.g., 5 or 5%.")
-
-# --- Monthly Overview Page ---
-elif page == "Monthly Overview":
-    st.title("📆 Monthly Overview")
-    if st.button("🚀 Start Tracking Now"):
-        st.switch_page("pages/Monthly-Overview.py")
-
-# --- Daily Expenses Page ---
-elif page == "Daily Expenses":
-    st.title("💸 Daily Expenses")
-    if st.button("🚀 Start Logging Now"):
-        st.switch_page("pages/Daily-Expenses.py")
+                st.error("❌ Invalid number format. Use numbers only (e.g., 5 or 5%).")

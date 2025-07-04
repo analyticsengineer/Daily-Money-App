@@ -33,8 +33,6 @@ Let’s take control of your money story.
 """
 )
 
-if st.button("Daily Expenses"):
-    st.switch_page("pages/Daily_Expenses.py")
+if st.button("Daily Money"):
+    st.switch_page("pages/Daily_Money.py")
 
-if st.button("Investment Tracker"):
-    st.switch_page("pages/Investment_Tracker.py")

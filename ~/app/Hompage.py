@@ -33,8 +33,5 @@ Let’s take control of your money story.
 """
 )
 
-# Add a button to jump into one of the pages
 if st.button("🚀 Start Tracking Now"):
-    st.switch_page("pages/Daily-Expenses.py")  # Adjust to your file structure
-    st.switch_page("pages/Monthly-Overview.py")
-    st.switch_page("pages/Investment-Tracker.py")
+    st.switch_page("pages/Daily-Expenses.py") 

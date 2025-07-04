@@ -8,16 +8,16 @@ from datetime import date
 load_dotenv()
 
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
-DAILY_EXPENSES_DB_ID = os.getenv("NOTION_DATABASE_ID")
+DAILY_EXPENSES_DB_ID = os.getenv("NOTION_DAILY_DB_ID")  # Updated for clarity
 
 if not NOTION_TOKEN or not DAILY_EXPENSES_DB_ID:
-    st.error("❌ Missing NOTION_TOKEN or NOTION_DATABASE_ID in environment variables.")
+    st.error("❌ Missing NOTION_TOKEN or NOTION_DAILY_DB_ID in environment variables.")
     st.stop()
 
 HEADERS = {
     "Authorization": f"Bearer {NOTION_TOKEN}",
     "Content-Type": "application/json",
-    "Notion-Version": "2022-06-28"  # Stable version
+    "Notion-Version": "2022-06-28"
 }
 
 # --- Notion API function ---
@@ -44,7 +44,7 @@ def add_daily_expense(data):
             "Payment Method": {
                 "select": {"name": data["payment_method"]}
             },
-            "Notes": {  # ✅ corrected field name
+            "Notes": {
                 "rich_text": [{"text": {"content": data["note"]}}]
             }
         }
@@ -86,6 +86,6 @@ with st.form("daily_expense_form"):
             }
             success = add_daily_expense(data)
             if success:
-                st.success("✅ Expense added successfully!")
+                st.success("✅ Expense added successfully to Daily Expenses!")
         except ValueError:
             st.error("❌ Invalid amount format. Use numbers only.")

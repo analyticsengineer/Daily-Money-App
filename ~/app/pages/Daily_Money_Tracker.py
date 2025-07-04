@@ -9,7 +9,7 @@ load_dotenv()
 
 # Notion setup
 NOTION_TOKEN = os.getenv("NOTION_TOKEN")
-INVESTMENT_RETURN_DB_ID = os.getenv("NOTION_INVESTMENT_DB_ID")  # Use specific DB ID
+NOTION_DAILY_DB_ID = os.getenv("NOTION_DAILY_DB_ID")  # ✅ Corrected name match
 
 HEADERS = {
     "Authorization": f"Bearer {NOTION_TOKEN}",
@@ -18,10 +18,10 @@ HEADERS = {
 }
 
 # Function to send data to Notion
-def add_investment_tracker(data):
+def add_daily_expenses(data):
     url = "https://api.notion.com/v1/pages"
     payload = {
-        "parent": {"database_id": INVESTMENT_RETURN_DB_ID},
+        "parent": {"database_id": NOTION_DAILY_DB_ID},
         "properties": {
             "Transaction": {
                 "title": [{"text": {"content": data["transaction"]}}]
@@ -34,9 +34,6 @@ def add_investment_tracker(data):
             },
             "Category": {
                 "select": {"name": data["category"]}
-            },
-            "Investment Return": {
-                "number": data["investment_return"]
             },
             "Type": {
                 "select": {"name": data["type"]}
@@ -57,15 +54,14 @@ def add_investment_tracker(data):
     return response.status_code in [200, 201]
 
 # --- Page UI ---
-st.set_page_config(page_title="💹 Investment Tracker", layout="centered")
-st.title("📈 Log Investment")
+st.set_page_config(page_title="💹 Daily Money Tracker", layout="centered")
+st.title("📈 Log Daily Money Tracker")
 
-with st.form("investment_tracker_form"):
+with st.form("daily_money_tracker_form"):  # ✅ fixed typo in form ID
     transaction = st.text_input("Transaction Name")
     date_value = st.date_input("Date", value=date.today())
     amount_str = st.text_input("Amount (use numbers only)", placeholder="e.g. 5,000")
     category = st.text_input("Category (enter manually)")
-    investment_return_str = st.text_input("Investment Return (%)", placeholder="e.g. 5 or 5%")
     expense_type = st.selectbox("Type", ["Expense", "Income", "Investment", "Savings", "Transfer"])
     payment_method = st.text_input("Payment Method (enter manually)")
     note = st.text_area("Notes (optional)", height=80)
@@ -74,21 +70,19 @@ with st.form("investment_tracker_form"):
     if submit:
         try:
             amount = float(amount_str.replace(",", ""))
-            investment_return = float(investment_return_str.replace("%", "").strip())
-
+            
             data = {
                 "transaction": transaction,
                 "date": str(date_value),
                 "amount": amount,
                 "category": category,
-                "investment_return": investment_return,
                 "type": expense_type,
                 "payment_method": payment_method,
                 "note": note
             }
 
-            success = add_investment_tracker(data)
+            success = add_daily_expenses(data)
             if success:
-                st.success("✅ Investment logged successfully!")
+                st.success("✅ Daily expense logged successfully!")  # ✅ Clear success message
         except ValueError:
             st.error("❌ Invalid number format. Use numbers only (e.g., 5 or 5%).")

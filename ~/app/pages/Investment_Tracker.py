@@ -60,9 +60,6 @@ def add_investment_tracker(data):
 # --- Streamlit App UI ---
 st.set_page_config(page_title="Notion Money Tracker App", layout="centered")
 
-# Sidebar page selector
-page = st.sidebar.selectbox("Select a page", ["Investment Tracker", "Monthly Overview", "Daily Expenses"])
-
 # --- Investment Tracker Page ---
 if page == "Investment Tracker":
     st.title("📈 Log Investment")

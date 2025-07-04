@@ -89,14 +89,3 @@ if page == "Daily Expenses":
                     st.error("❌ Failed to add expense to Notion.")
             except ValueError:
                 st.error("❌ Invalid amount format. Use numbers only.")
-
-
-elif page == "Monthly Overview":
-    st.title("📆 Monthly Overview")
-    if st.button("🚀 Start Tracking Now"):
-        st.switch_page("pages/Monthly_Overview.py")
-        
-elif page == "Investment Tracker":
-    st.title("📈 Investment Tracker")
-    st.button("🚀 Start Tracking Now"):
-       st.switch_page("pages/Investment_Tracker.py")

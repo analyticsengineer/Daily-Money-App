@@ -56,34 +56,40 @@ def add_daily_expenses(data):
 st.set_page_config(page_title="💹 Daily Money", layout="centered")
 st.title("📈 Log Daily Money")
 
-# --- Initialize session state defaults ---
-for key in ["transaction", "amount_str", "category", "expense_type", "payment_method", "note"]:
-    if key not in st.session_state:
-        st.session_state[key] = ""
+# Initialize session state only once
+for key, default in {
+    "transaction": "",
+    "amount_str": "",
+    "category": "",
+    "expense_type": "Expense",
+    "payment_method": "",
+    "note": ""
+}.items():
+    st.session_state.setdefault(key, default)
 
 # Form
 with st.form("daily_money_tracker_form"):
-    transaction = st.text_input("Transaction Name", value=st.session_state.transaction, key="transaction")
+    st.text_input("Transaction Name", key="transaction")
     date_value = st.date_input("Date", value=date.today())
-    amount_str = st.text_input("Amount (use numbers only)", placeholder="e.g. 5,000", value=st.session_state.amount_str, key="amount_str")
-    category = st.text_input("Category (enter manually)", value=st.session_state.category, key="category")
-    expense_type = st.selectbox("Type", ["Expense", "Income", "Investment", "Savings", "Transfer"], key="expense_type")
-    payment_method = st.text_input("Payment Method (enter manually)", value=st.session_state.payment_method, key="payment_method")
-    note = st.text_area("Notes (optional)", height=80, value=st.session_state.note, key="note")
+    st.text_input("Amount (use numbers only)", placeholder="e.g. 5,000", key="amount_str")
+    st.text_input("Category (enter manually)", key="category")
+    st.selectbox("Type", ["Expense", "Income", "Investment", "Savings", "Transfer"], key="expense_type")
+    st.text_input("Payment Method (enter manually)", key="payment_method")
+    st.text_area("Notes (optional)", height=80, key="note")
     submit = st.form_submit_button("Submit")
 
     if submit:
         try:
-            amount = float(amount_str.replace(",", ""))
+            amount = float(st.session_state.amount_str.replace(",", ""))
 
             data = {
-                "transaction": transaction,
+                "transaction": st.session_state.transaction,
                 "date": str(date_value),
                 "amount": amount,
-                "category": category,
-                "type": expense_type,
-                "payment_method": payment_method,
-                "note": note
+                "category": st.session_state.category,
+                "type": st.session_state.expense_type,
+                "payment_method": st.session_state.payment_method,
+                "note": st.session_state.note
             }
 
             success = add_daily_expenses(data)
@@ -91,7 +97,7 @@ with st.form("daily_money_tracker_form"):
                 st.success("✅ Daily Money logged successfully!")
 
                 # Reset form values
-                for key in ["transaction", "amount_str", "category", "payment_method", "note"]:
-                    st.session_state[key] = ""
+                for field in ["transaction", "amount_str", "category", "payment_method", "note"]:
+                    st.session_state[field] = ""
         except ValueError:
             st.error("❌ Invalid number format. Use numbers only (e.g., 5 or 5%).")

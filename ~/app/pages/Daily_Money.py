@@ -56,19 +56,27 @@ def add_daily_expenses(data):
 st.set_page_config(page_title="💹 Daily Money", layout="centered")
 st.title("📈 Log Daily Money")
 
-# Default values for form fields
+# Form default values
 default_values = {
     "transaction": "",
     "amount_str": "",
     "category": "",
     "payment_method": "",
     "note": "",
-    "expense_type": "Expense"  # Must match selectbox option
+    "expense_type": "Expense"
 }
 
-# First-time session state setup
+# Initialize session state for fields
 for key, val in default_values.items():
     st.session_state.setdefault(key, val)
+st.session_state.setdefault("submitted", False)
+
+# Clear form if just submitted
+if st.session_state.submitted:
+    for key in default_values:
+        st.session_state[key] = default_values[key]
+    st.session_state.submitted = False
+    st.success("✅ Daily Money logged successfully!")
 
 # --- Form ---
 with st.form("daily_money_tracker_form"):
@@ -97,14 +105,7 @@ with st.form("daily_money_tracker_form"):
 
             success = add_daily_expenses(data)
             if success:
-                st.success("✅ Daily Money logged successfully!")
-
-                # Clear fields from session state
-                for key in default_values:
-                    st.session_state[key] = default_values[key]
-
-                # Rerun to show cleared form
+                st.session_state.submitted = True
                 st.experimental_rerun()
-
         except ValueError:
             st.error("❌ Invalid number format. Use numbers only (e.g., 5 or 5%).")
